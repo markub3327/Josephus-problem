@@ -19,6 +19,7 @@
 
             // Setter
             void setDalsi(Bojovnik *dalsi) { this->dalsi = dalsi; }
+            void setId(uint64_t id) { this->id = id; }
     };
 
     class ZoznamBojovnikov  // Trieda zoznamu
@@ -116,7 +117,20 @@
 
             void pridajBojovnikov(Bojovnik *bojovnik, uint64_t pocet_bojovnikov)
             {
-                auto tmp = bojovnik->getDalsi();
+                Bojovnik *vyber = bojovnik;
+
+                for (int i = 0; i < pocet_bojovnikov; i++, vyber = vyber->getDalsi())
+                {
+                    vyber->setDalsi(new Bojovnik((vyber->getId()+1), vyber->getDalsi()));   // nastav noveho bojovnika ako nasledovnika za ukazatel
+                }
+
+                // ak pridavame od konca zoznamu
+                if (bojovnik == this->chvost)
+                    this->chvost = vyber;
+                //else    // skontroluj id zvysku zoznamu
+                //{
+                //    ...
+                //}
             }
 
             Bojovnik *getHlava() { return this->hlava; }
@@ -138,32 +152,40 @@
         std::cin >> N;
         armada = new ZoznamBojovnikov(N);
 
-        // pocet bojovnikov v armade
-        auto pocet = armada->pocetBojovnikov(armada->getHlava());
-        std::cout << "Pocet bojovnikov: " << pocet << std::endl;
+        do {
+            // pocet bojovnikov v armade
+            auto pocet = armada->pocetBojovnikov(armada->getHlava());
+            std::cout << "Pocet bojovnikov: " << pocet << std::endl;
 
-        // zmeraj vzdialenost bojovnikov
-        auto vzdialenost = armada->vzdialenostBojovnikov(armada->getChvost(), armada->getHlava());
-        std::cout << "Vzdialenost bojovnikov chvost-hlava: " << vzdialenost << std::endl;
-        vzdialenost = armada->vzdialenostBojovnikov(armada->getHlava(), armada->getChvost());
-        std::cout << "Vzdialenost bojovnikov hlava-chvost: " << vzdialenost << std::endl;
+            // zmeraj vzdialenost bojovnikov
+            auto vzdialenost = armada->vzdialenostBojovnikov(armada->getChvost(), armada->getHlava());
+            std::cout << "Vzdialenost bojovnikov chvost-hlava: " << vzdialenost << std::endl;
+            vzdialenost = armada->vzdialenostBojovnikov(armada->getHlava(), armada->getChvost());
+            std::cout << "Vzdialenost bojovnikov hlava-chvost: " << vzdialenost << std::endl;
 
-        // vybijanie bojovnikov
-        int M;
-        std::cout << "Zadajte po kolko sa odpocitavaju: ";
-        std::cin >> M;
-        auto bojovnik = armada->vybiBojovnikov(M);
-        std::cout << "Posledny zostal " << bojovnik->getId() << ". bojovnik" << std::endl << std::endl;
+            // vybijanie bojovnikov
+            int M;
+            std::cout << "Zadajte po kolko sa odpocitavaju: ";
+            std::cin >> M;
+            auto bojovnik = armada->vybiBojovnikov(M);
+            std::cout << "Posledny zostal " << bojovnik->getId() << ". bojovnik" << std::endl << std::endl;
+            bojovnik->setId(1); // vynulovanie id pocitadla bojovnikov
 
-        // pocet bojovnikov v armade
-        pocet = armada->pocetBojovnikov(armada->getHlava());
-        std::cout << "Pocet bojovnikov: " << pocet << std::endl;
+            // pocet bojovnikov v armade
+            pocet = armada->pocetBojovnikov(armada->getHlava());
+            std::cout << "Pocet bojovnikov: " << pocet << std::endl;
 
-        // zmeraj vzdialenost bojovnikov
-        vzdialenost = armada->vzdialenostBojovnikov(armada->getChvost(), armada->getHlava());
-        std::cout << "Vzdialenost bojovnikov chvost-hlava: " << vzdialenost << std::endl;
-        vzdialenost = armada->vzdialenostBojovnikov(armada->getHlava(), armada->getChvost());
-        std::cout << "Vzdialenost bojovnikov hlava-chvost: " << vzdialenost << std::endl;
+            // zmeraj vzdialenost bojovnikov
+            vzdialenost = armada->vzdialenostBojovnikov(armada->getChvost(), armada->getHlava());
+            std::cout << "Vzdialenost bojovnikov chvost-hlava: " << vzdialenost << std::endl;
+            vzdialenost = armada->vzdialenostBojovnikov(armada->getHlava(), armada->getChvost());
+            std::cout << "Vzdialenost bojovnikov hlava-chvost: " << vzdialenost << std::endl;
+
+            // pridaj bojovnikov do zoznamu
+            std::cout << "Zadajte pocet bojovnikov k pridaniu: ";
+            std::cin >> N;
+            armada->pridajBojovnikov(armada->getHlava(), N);
+        } while (N > 0);
 
         delete armada;  // uvolni pamat
 
